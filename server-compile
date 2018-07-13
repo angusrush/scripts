@@ -1,0 +1,63 @@
+#!/usr/bin/zsh
+
+# exit script on error
+set -e
+
+# current directory
+directory=${PWD}
+
+# the name of the current folder
+folder=${PWD##*/}
+
+# the command to use to run latexmk
+latexmkCommand="latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose ${1}.tex"
+
+# Throw an error and exit unless a single valid argument is given
+if [ "$#" -ne 1 ]; then # check that correct number of arguments are given
+        echo "Wrong number of arguments! Exiting."
+        exit 1
+elif [ ! -f ${directory}/${1}.tex ]; then # check that file ${1}.tex exists
+        echo "File ${1}.tex does not exist. Exiting."
+        exit 1
+fi
+# check that server is reachable, throw error if not
+echo ""
+echo "Making sure angus-server.duckdns.org is online..."
+# if the ping doesn't see the server, the string won't exist -- throw an error
+nmapout=$(nping -p 22 -c 1 angus-server.duckdns.org | grep 'Successful connections: 1' || true)
+if [[ ! "${nmapout}" == "TCP connection attempts: 1 | Successful connections: 1 | Failed: 0 (0.00%)" ]]; then
+        echo "Port 22 on server angus-server.duckdns.org is down. Exiting."
+        exit 1
+fi
+echo "It is!"
+echo ""
+echo "Syncing the directory"
+echo "    ${directory}"
+echo "to"
+echo "    angus-server.duckdns.org:/tmp/${folder}"
+rsync -a ${directory} angus@angus-server.duckdns.org:/tmp/
+echo "Done."
+echo ""
+echo "Running latexmk on angus-server.duckdns.org:/tmp/${folder} with command"
+echo "   ${latexmkCommand}"
+echo ""
+echo "------- latexmk output begins here -------"
+echo ""
+ssh angus@angus-server.duckdns.org "cd /tmp/${folder} && time ${latexmkCommand}"
+echo ""
+echo "------- latexmk output ends here -------"
+echo ""
+echo "Syncing directory"
+echo "    angus-server.duckdns.org:/tmp/${folder}"
+echo "back to"
+echo "    ${directory}"
+rsync -a angus@angus-server.duckdns.org:/tmp/${folder}/ ${directory}/
+echo "Done."
+echo ""
+echo "Tweaking ${1}.synctex.gz to make synctex work..."
+yes | gzip -f -d ${1}.synctex.gz
+sed -i -e 's/\/tmp/\.\./' ${1}.synctex
+gzip ${1}.synctex
+echo "Done. Exiting successfully! :)"
+
+
