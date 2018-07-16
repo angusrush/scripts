@@ -3,8 +3,6 @@
 currentbrightness=$(cat /sys/class/backlight/intel_backlight/brightness)
 maxbrightness=$(cat /sys/class/backlight/intel_backlight/max_brightness)
 
-percentbrightness=$(bc <<< "${currentbrightness}*100/${maxbrightness}")
-
 if [ $currentbrightness -eq "1" ]
 then xbright =400
 else xbright =1 
