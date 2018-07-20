@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Get current mouse location from xdotool
+mouselocation=$(xdotool getmouselocation)
+[[ "$mouselocation" =~ x:([0-9]+)\ y:([0-9]+) ]]
+xpos=${BASH_REMATCH[1]}
+ypos=${BASH_REMATCH[2]}
+
+# Get maximum x, cursor values from resolution of monitor
+resolution=$(xrandr | grep current)
+[[ "$resolution" =~ current\ ([0-9]+)\ x\ ([0-9]+) ]]
+xmax=$(bc<<<"${BASH_REMATCH[1]}-1")
+ymax=$(bc<<<"${BASH_REMATCH[2]}-1")
+
+# Get old mouse position
+oldmouselocation=$(cat $HOME/.cursorloc)
+[[ "$oldmouselocation" =~ x:([0-9]+)\ y:([0-9]+) ]]
+oldxpos=${BASH_REMATCH[1]}
+oldypos=${BASH_REMATCH[2]}
+
+if [[ $xpos != $xmax && $ypos != $ymax ]]; then
+        echo "x:${xpos} y:${ypos}" > $HOME/.cursorloc
+        xdotool mousemove $xmax $ymax
+else
+        xdotool mousemove $oldxpos $oldypos
+fi
+
