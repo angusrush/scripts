@@ -20,6 +20,7 @@ elif [ ! -f ${directory}/${1}.tex ]; then # check that file ${1}.tex exists
         echo "File ${1}.tex does not exist. Exiting."
         exit 1
 fi
+
 # check that server is reachable, throw error if not
 echo ""
 echo "Making sure angus-server.duckdns.org is online..."
@@ -29,6 +30,8 @@ if [[ ! "${nmapout}" == "TCP connection attempts: 1 | Successful connections: 1 
         echo "Port 22 on server angus-server.duckdns.org is down. Exiting."
         exit 1
 fi
+
+# If we get this far, the command makes sense and the server is online.
 echo "It is!"
 echo ""
 echo "Syncing the directory"
