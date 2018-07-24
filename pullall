@@ -1,0 +1,21 @@
+#!/usr/bin/zsh
+
+echo "Pulling dotfiles"
+git pull /home/angus/rc/
+
+echo ""
+echo "Pulling neovim config"
+git pull /home/angus/.config/nvim/
+
+echo ""
+echo "Pulling scripts"
+git pull /home/angus/scripts
+
+echo ""
+echo "Pulling latex stuff"
+git pull /home/angus/latex/homework/
+git pull /home/angus/latex/notes-private/
+git pull /home/angus/latex/notes-public/
+git pull /home/angus/latex/misc/
+
+
