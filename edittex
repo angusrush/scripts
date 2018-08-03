@@ -4,4 +4,6 @@ set -e
 
 texFiles=$(ls | grep "\.tex$")
 
+#print "$texFiles"
+
 nvim "$texFiles"
