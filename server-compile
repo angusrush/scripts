@@ -38,7 +38,7 @@ echo "Syncing the directory"
 echo "    ${directory}"
 echo "to"
 echo "    angus-server.duckdns.org:/tmp/${folder}"
-rsync -a -h --info=progress2 ${directory} angus@angus-server.duckdns.org:/tmp/
+rsync --delete -a -h --info=progress2 ${directory} angus@angus-server.duckdns.org:/tmp/
 echo "Done."
 echo ""
 echo "Running latexmk on angus-server.duckdns.org:/tmp/${folder} with command"
@@ -54,7 +54,7 @@ echo "Syncing directory"
 echo "    angus-server.duckdns.org:/tmp/${folder}"
 echo "back to"
 echo "    ${directory}"
-rsync -a -h --info=progress2 angus@angus-server.duckdns.org:/tmp/${folder}/ ${directory}/
+rsync --delete -a -h --info=progress2 angus@angus-server.duckdns.org:/tmp/${folder}/ ${directory}/
 echo "Done."
 echo ""
 echo "Tweaking ${1}.synctex.gz to make synctex work..."
