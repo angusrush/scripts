@@ -1,66 +1,66 @@
-#!/usr/bin/zsh
+#!/usr/bin/python3
+import os
+import argparse as ap
+import subprocess as sp
+import sys
 
-# exit script on error
-set -e
+SERVER = "angus@angus-server.duckdns.org"
+COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose"
 
-# current directory
-directory=${PWD}
+parser = ap.ArgumentParser(description="Compile file.tex on angus-server")
+parser.add_argument(metavar='/path/to/file.tex', \
+        dest='filepath', \
+        type=str, \
+        help="Absolute path to file.tex to be compiled")
 
-# the name of the current folder
-folder=${PWD##*/}
+args = parser.parse_args()
+path = args.filepath
 
-# the command to use to run latexmk
-latexmkCommand="latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose ${1}.tex"
+folder, filename = os.path.split(path)
+filenamenoextension, extension = os.path.splitext(filename)
+top_folder = os.path.split(folder)[1]
 
-# Throw an error and exit unless a single valid argument is given
-if [ "$#" -ne 1 ]; then # check that correct number of arguments are given
-        echo "Wrong number of arguments! Exiting."
-        exit 1
-elif [ ! -f ${directory}/${1}.tex ]; then # check that file ${1}.tex exists
-        echo "File ${1}.tex does not exist. Exiting."
-        exit 1
-fi
+if not os.path.isfile(path):
+    print(path + " does not exist.")
+    sys.exit(1)
+elif not os.path.isabs(path):
+    print(path + " is not absolute.")
+    sys.exit(1)
+elif not extension == '.tex':
+    print(path + " does not have .tex extension.")
+    sys.exit(1)
 
-# check that server is reachable, throw error if not
-echo ""
-echo "Making sure angus-server.duckdns.org is online..."
-# if the ping doesn't see the server, the string won't exist -- throw an error
-nmapout=$(nping -p 22 -c 1 angus-server.duckdns.org | grep 'Successful connections: 1' || true)
-if [[ ! "${nmapout}" == "TCP connection attempts: 1 | Successful connections: 1 | Failed: 0 (0.00%)" ]]; then
-        echo "Port 22 on server angus-server.duckdns.org is down. Exiting."
-        exit 1
-fi
+print("Syncing " + folder + " to " + SERVER + "...")
+forward_sync = sp.run("rsync -a -h --delete --exclude=\".[!.]*\" --info=progress2 " + folder + " " + SERVER + ":/tmp/", shell=True)
 
-# If we get this far, the command makes sense and the server is online.
-echo "It is!"
-echo ""
-echo "Syncing the directory"
-echo "    ${directory}"
-echo "to"
-echo "    angus-server.duckdns.org:/tmp/${folder}"
-rsync --delete -a -h --info=progress2 ${directory} angus@angus-server.duckdns.org:/tmp/
-echo "Done."
-echo ""
-echo "Running latexmk on angus-server.duckdns.org:/tmp/${folder} with command"
-echo "   ${latexmkCommand}"
-echo ""
-echo "------- latexmk output begins here -------"
-echo ""
-ssh angus@angus-server.duckdns.org "cd /tmp/${folder} && ${latexmkCommand}"
-echo ""
-echo "------- latexmk output ends here -------"
-echo ""
-echo "Syncing directory"
-echo "    angus-server.duckdns.org:/tmp/${folder}"
-echo "back to"
-echo "    ${directory}"
-rsync --delete -a -h --info=progress2 angus@angus-server.duckdns.org:/tmp/${folder}/ ${directory}/
-echo "Done."
-echo ""
-echo "Tweaking ${1}.synctex.gz to make synctex work..."
-yes | gzip -f -d ${1}.synctex.gz
-sed -i -e 's/\/tmp/\.\./' ${1}.synctex
-gzip ${1}.synctex
-echo "Done. Exiting successfully! :)"
+if forward_sync.returncode != 0:
+    print("Forward rsync finished with nonzero exit code. Exiting.")
+    sys.exit(1)
 
+ssh_command = "ssh " + SERVER + " \"" + "cd /tmp/" + top_folder + " && " + COMMAND + " " + filename + "\""
 
+print("Success! Running command:")
+print("    " + ssh_command)
+print("----- latexmk output begins here -----")
+latexmk_run = sp.run(ssh_command, shell=True)
+print("----- latexmk output ends here -----")
+
+if latexmk_run.returncode != 0:
+    print("Server-side latexmk run finished with nonzero exit code. Not syncing back.")
+    sys.exit(1)
+else:
+    print:("latexmk run successful! Syncing back...")
+
+rsync_back = sp.run("rsync -a -h --exclude=\".[!.]*\" --info=progress2 " + SERVER + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
+
+if rsync_back.returncode != 0:
+    print("Rsync back failed for some reason.")
+    sys.exit(1)
+else:
+    print("Synced back succesfully!")
+
+print("Fiddling with " + filenamenoextension + ".synctex.gz to make synctex work...")
+sp.run("yes | gzip -f -d " + filenamenoextension + ".synctex.gz", shell=True)
+sp.run("sed -i -e 's/\/tmp/\.\./' " + filenamenoextension + ".synctex", shell=True)
+sp.run("gzip " + filenamenoextension + ".synctex", shell=True)
+print("Done! Exiting :)")
