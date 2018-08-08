@@ -5,7 +5,7 @@ import subprocess as sp
 import sys
 
 SERVER = "angus@angus-server.duckdns.org"
-COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose"
+LATEXMK_COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose -f"
 
 parser = ap.ArgumentParser(description="Compile file.tex on angus-server")
 parser.add_argument(metavar='/path/to/file.tex', \
@@ -15,9 +15,8 @@ parser.add_argument(metavar='/path/to/file.tex', \
 
 args = parser.parse_args()
 path = args.filepath
-
 folder, filename = os.path.split(path)
-filenamenoextension, extension = os.path.splitext(filename)
+stem, extension = os.path.splitext(filename)
 top_folder = os.path.split(folder)[1]
 
 if not os.path.isfile(path):
@@ -31,13 +30,13 @@ elif not extension == '.tex':
     sys.exit(1)
 
 print("Syncing " + folder + " to " + SERVER + "...")
-forward_sync = sp.run("rsync -a -h --delete --exclude=\".[!.]*\" --info=progress2 " + folder + " " + SERVER + ":/tmp/", shell=True)
+forward_sync = sp.run("rsync -a -h --exclude=\".[!.]*\" --info=progress2 " + folder + " " + SERVER + ":/tmp/", shell=True)
 
 if forward_sync.returncode != 0:
     print("Forward rsync finished with nonzero exit code. Exiting.")
     sys.exit(1)
 
-ssh_command = "ssh " + SERVER + " \"" + "cd /tmp/" + top_folder + " && " + COMMAND + " " + filename + "\""
+ssh_command = "ssh " + SERVER + " \"" + "cd /tmp/" + top_folder + " && " + LATEXMK_COMMAND + " " + filename + "\""
 
 print("Success! Running command:")
 print("    " + ssh_command)
@@ -59,8 +58,8 @@ if rsync_back.returncode != 0:
 else:
     print("Synced back succesfully!")
 
-print("Fiddling with " + filenamenoextension + ".synctex.gz to make synctex work...")
-sp.run("yes | gzip -f -d " + filenamenoextension + ".synctex.gz", shell=True)
-sp.run("sed -i -e 's/\/tmp/\.\./' " + filenamenoextension + ".synctex", shell=True)
-sp.run("gzip " + filenamenoextension + ".synctex", shell=True)
+print("Fiddling with " + stem + ".synctex.gz to make synctex work...")
+sp.run("yes | gzip -f -d " + stem + ".synctex.gz", shell=True)
+sp.run("sed -i -e 's/\/tmp/\.\./' " + stem + ".synctex", shell=True)
+sp.run("gzip " + stem + ".synctex", shell=True)
 print("Done! Exiting :)")
