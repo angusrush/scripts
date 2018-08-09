@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+import os
+import subprocess as sp
+import sys
+
+SERVER = "angus@angus-server.duckdns.org"
+
+print("Syncing Textbooks collection to " + SERVER + "...")
+forward_sync = sp.run("rsync -ah --info=progress2 /home/angus/Textbooks angus-server.duckdns.org:/home/angus", shell=True)
+
+if forward_sync.returncode != 0:
+    print("Forward rsync finished with nonzero exit code. Exiting.")
+    sys.exit(1)
+print("Success!")
