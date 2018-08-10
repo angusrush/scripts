@@ -24,5 +24,3 @@ cd /home/angus/latex/notes-public/ && git pull
 cd /home/angus
 cd /home/angus/latex/misc/ && git pull 
 cd /home/angus
-
-
