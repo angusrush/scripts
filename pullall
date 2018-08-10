@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 echo "Pulling dotfiles"
-cd /home/angus/rc/ && git pull 
+cd /home/angus/dotfiles/ && git pull 
 cd /home/angus
 
 echo ""
@@ -11,7 +11,7 @@ cd /home/angus
 
 echo ""
 echo "Pulling scripts"
-cd /home/angus/programming/scripts && git pull 
+cd /home/angus/scripts && git pull 
 cd /home/angus
 
 echo ""
@@ -21,6 +21,4 @@ cd /home/angus
 cd /home/angus/latex/notes-private/ && git pull 
 cd /home/angus
 cd /home/angus/latex/notes-public/ && git pull 
-cd /home/angus
-cd /home/angus/latex/misc/ && git pull 
 cd /home/angus
