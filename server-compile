@@ -50,7 +50,7 @@ if latexmk_run.returncode != 0:
 else:
     print:("latexmk run successful! Syncing back...")
 
-rsync_back = sp.run("rsync -a -h --exclude=\".[!.]*\" --info=progress2 " + SERVER + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
+rsync_back = sp.run("rsync -a -h --exclude=\"(.[!.]*|*.tex)\" --info=progress2 " + SERVER + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
 
 if rsync_back.returncode != 0:
     print("Rsync back failed for some reason.")
