@@ -1,3 +1,21 @@
+# server-compile compiles a latex document on a server, then syncs back the
+# result to avoid frequent compilation on a laptop.
+#
+# Copyright (C) 2018 Angus Rush
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #!/usr/bin/python3
 import os
 import argparse as ap
@@ -30,13 +48,15 @@ elif not extension == '.tex':
     sys.exit(1)
 
 print("Syncing " + folder + " to " + SERVER + "...")
-forward_sync = sp.run("rsync -a -h --exclude=\".[!.]*\" --info=progress2 " + folder + " " + SERVER + ":/tmp/", shell=True)
+forward_sync = sp.run("rsync -a -h --exclude=\".[!.]*\" --info=progress2 " \
+        + folder + " " + SERVER + ":/tmp/", shell=True)
 
 if forward_sync.returncode != 0:
     print("Forward rsync finished with nonzero exit code. Exiting.")
     sys.exit(1)
 
-ssh_command = "ssh " + SERVER + " \"" + "cd /tmp/" + top_folder + " && " + LATEXMK_COMMAND + " " + filename + "\""
+ssh_command = "ssh " + SERVER + " \"" + "cd /tmp/" + top_folder + " && "  \
+        + LATEXMK_COMMAND + " " + filename + "\""
 
 print("Success! Running command:")
 print("    " + ssh_command)
@@ -45,12 +65,14 @@ latexmk_run = sp.run(ssh_command, shell=True)
 print("----- latexmk output ends here -----")
 
 if latexmk_run.returncode != 0:
-    print("Server-side latexmk run finished with nonzero exit code. Not syncing back.")
+    print("Server-side latexmk run finished with nonzero exit code. \
+            Not syncing back.")
     sys.exit(1)
 else:
     print:("latexmk run successful! Syncing back...")
 
-rsync_back = sp.run("rsync -a -h --exclude=\"(.[!.]*|*.tex)\" --info=progress2 " + SERVER + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
+rsync_back = sp.run("rsync -a -h --exclude=\"(.[!.]*|*.tex)\" --info=progress2 " \
+        + SERVER + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
 
 if rsync_back.returncode != 0:
     print("Rsync back failed for some reason.")
