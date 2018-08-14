@@ -1,22 +1,23 @@
-# server-compile compiles a latex document on a server, then syncs back the
-# result to avoid frequent compilation on a laptop.
+#!/usr/bin/python3
+#
+# server-compile syncs a latex document to a server and compiles it there, then
+# rsyncs back the result to avoid frequent compilation on a laptop.
 #
 # Copyright (C) 2018 Angus Rush
-# 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#!/usr/bin/python3
 import os
 import argparse as ap
 import subprocess as sp
@@ -26,9 +27,10 @@ SERVER = "angus@angus-server.duckdns.org"
 LATEXMK_COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose -f"
 
 parser = ap.ArgumentParser(description="Compile file.tex on angus-server")
-parser.add_argument(metavar='/path/to/file.tex', \
-        dest='filepath', \
-        type=str, \
+parser.add_argument(
+        metavar='/path/to/file.tex',
+        dest='filepath',
+        type=str,
         help="Absolute path to file.tex to be compiled")
 
 args = parser.parse_args()
