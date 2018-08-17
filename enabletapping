@@ -1,0 +1,11 @@
+#!/bin/bash
+
+xinput=$(xinput | grep TouchPad)
+[[ $xinput =~ id=([0-9]+) ]]
+padID="${BASH_REMATCH[1]}"
+
+listProps=$(xinput list-props $padID | grep "Tapping Enabled (")
+[[ $listProps =~ \(([0-9]+)\) ]]
+propID="${BASH_REMATCH[1]}"
+
+xinput set-prop $padID $propID 1
