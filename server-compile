@@ -23,7 +23,7 @@ import argparse as ap
 import subprocess as sp
 import sys
 
-SERVER = "angus@angus-server.duckdns.org"
+SERVER = "angus-server.duckdns.org"
 LATEXMK_COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose -f"
 
 parser = ap.ArgumentParser(description="Compile file.tex on " + SERVER)
