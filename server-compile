@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #
-# server-compile syncs a latex document to a server and compiles it there, then
-# rsyncs back the result to avoid frequent compilation on a laptop.
+# server-compile compiles a latex document on a server to avoid frequent
+# compilation on a laptop.
 #
 # Copyright (C) 2018 Angus Rush
 #
@@ -26,7 +26,7 @@ import sys
 SERVER = "angus@angus-server.duckdns.org"
 LATEXMK_COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose -f"
 
-parser = ap.ArgumentParser(description="Compile file.tex on angus-server")
+parser = ap.ArgumentParser(description="Compile file.tex on " + SERVER)
 parser.add_argument(
         metavar='/path/to/file.tex',
         dest='filepath',
