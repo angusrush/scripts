@@ -1,9 +1,7 @@
-#!/bin/zsh
+#!/bin/bash
 
 set -e
 
-texFiles=$(ls | grep "\.tex$")
+texFiles=`ls | grep "\.tex$" | tr '\n' ' '`
 
-#print "$texFiles"
-
-nvim "$texFiles"
+nvim $texFiles
