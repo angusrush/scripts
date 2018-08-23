@@ -23,21 +23,43 @@ import argparse as ap
 import subprocess as sp
 import sys
 
-SERVER = "angus-server.duckdns.org"
 LATEXMK_COMMAND = "latexmk -pdf -interaction=nonstopmode -synctex=1 -verbose -f"
 
-parser = ap.ArgumentParser(description="Compile file.tex on " + SERVER)
+parser = ap.ArgumentParser(description="Compile file.tex on remote server")
 parser.add_argument(
         metavar='/path/to/file.tex',
         dest='filepath',
         type=str,
         help="Absolute path to file.tex to be compiled")
 
+parser.add_argument(
+        '--server',
+        metavar='server',
+        dest='servername',
+        type=str,
+        help="Name of server, e.g. angus-server.duckdns.org")
+
+# Parse command line arguments
 args = parser.parse_args()
 path = args.filepath
+server = args.servername
+
+# We will especially need a lot of folder information. For example, if
+# --server is passed with argument
+#    "/home/angus/latex/notes-public/category_theory/notes.tex"
+# then the following variable assignments occur.
+#
+# folder         = "/home/angus/latex/notes-public/category_theory"
+# filename       = "notes.tex"
+# stem           = "notes"
+# extension      = ".tex"
+# bottom_folders = "/home/angus/latex/notes-public"
+# top_folder     = "category_theory"
+#
+
 folder, filename = os.path.split(path)
 stem, extension = os.path.splitext(filename)
-top_folder = os.path.split(folder)[1]
+bottom_folders, top_folder = os.path.split(folder)
 
 if not os.path.isfile(path):
     print(path + " does not exist.")
@@ -49,15 +71,15 @@ elif not extension == '.tex':
     print(path + " does not have .tex extension.")
     sys.exit(1)
 
-print("Syncing " + folder + " to " + SERVER + "...")
+print("Syncing " + folder + " to " + server + "...")
 forward_sync = sp.run("rsync -a -h --exclude=\".[!.]*\" --info=progress2 " \
-        + folder + " " + SERVER + ":/tmp/", shell=True)
+        + folder + " " + server + ":/tmp/", shell=True)
 
 if forward_sync.returncode != 0:
     print("Forward rsync finished with nonzero exit code. Exiting.")
     sys.exit(1)
 
-ssh_command = "ssh " + SERVER + " \"" + "cd /tmp/" + top_folder + " && "  \
+ssh_command = "ssh " + server + " \"" + "cd /tmp/" + top_folder + " && "  \
         + LATEXMK_COMMAND + " " + filename + "\""
 
 print("Success! Running command:")
@@ -74,7 +96,7 @@ else:
     print:("latexmk run successful! Syncing back...")
 
 rsync_back = sp.run("rsync -a -h --exclude=\"(.[!.]*|*.tex)\" --info=progress2 " \
-        + SERVER + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
+        + server + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
 
 if rsync_back.returncode != 0:
     print("Rsync back failed for some reason.")
@@ -84,6 +106,7 @@ else:
 
 print("Fiddling with " + stem + ".synctex.gz to make synctex work...")
 sp.run("yes | gzip -f -d " + stem + ".synctex.gz", shell=True)
-sp.run("sed -i -e 's/\/tmp/\.\./' " + stem + ".synctex", shell=True)
+sp.run("sed -i -e \'s#/tmp#" + bottom_folders + "#\' " + stem + ".synctex", shell=True)
+sp.run("sed -i -e \'s#/./#/#\' " + stem + ".synctex", shell=True)
 sp.run("gzip " + stem + ".synctex", shell=True)
 print("Done! Exiting :)")
