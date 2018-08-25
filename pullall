@@ -1,11 +1,7 @@
-#!/usr/bin/zsh
+#!/usr/bin/env bash
 
 echo "Pulling dotfiles"
 cd /home/angus/rc/ && git pull 
-
-echo ""
-echo "Pulling neovim config"
-cd /home/angus/.config/nvim/ && git pull 
 
 echo ""
 echo "Pulling scripts"
@@ -17,3 +13,16 @@ cd /home/angus/latex/homework/ && git pull
 cd /home/angus/latex/notes-private/ && git pull 
 cd /home/angus/latex/notes-public/ && git pull 
 cd /home/angus/latex/misc/ && git pull 
+
+echo ""
+echo "Pulling neovim config"
+cd /home/angus/.config/nvim/ && git pull 
+echo "Updating plugins"
+cd /home/angus/.config/nvim/bundle/
+for i in `ls`; do
+        echo "Pulling $i"
+        cd $i
+        git checkout master
+        git pull
+        cd ..
+done
