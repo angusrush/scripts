@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-# server-compile compiles a latex document on a server to avoid frequent
+# server-compile compiles a latex document on a remote server to avoid frequent
 # compilation on a laptop.
 #
 # Copyright (C) 2018 Angus Rush
