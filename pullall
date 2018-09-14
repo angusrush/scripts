@@ -17,12 +17,3 @@ cd /home/angus/latex/misc/ && git pull
 echo ""
 echo "Pulling neovim config"
 cd /home/angus/.config/nvim/ && git pull 
-echo "Updating plugins"
-cd /home/angus/.config/nvim/bundle/
-for i in `ls`; do
-        echo "Pulling $i"
-        cd $i
-        git checkout master
-        git pull
-        cd ..
-done

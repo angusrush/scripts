@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo "Updating plugins"
+cd /home/angus/.config/nvim/bundle/
+for i in `ls`; do
+        echo "Updating $i"
+        cd $i
+        git checkout master
+        git pull
+        cd ..
+        echo ""
+done
