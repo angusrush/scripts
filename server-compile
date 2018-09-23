@@ -45,7 +45,7 @@ path = args.filepath
 server = args.servername
 
 # We will especially need a lot of folder information. For example, if
-# --server is passed with argument
+# server-compile is called with argument
 #    "/home/angus/latex/notes-public/category_theory/notes.tex"
 # then the following variable assignments occur.
 #
