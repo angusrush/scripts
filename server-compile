@@ -44,10 +44,12 @@ args = parser.parse_args()
 path = args.filepath
 server = args.servername
 
-# We will especially need a lot of folder information. For example, if
+# We will need a lot of folder information. For example, if
 # server-compile is called with argument
+#
 #    "/home/angus/latex/notes-public/category_theory/notes.tex"
-# then the following variable assignments occur.
+#
+# then the following variable assignments should occur.
 #
 # folder         = "/home/angus/latex/notes-public/category_theory"
 # filename       = "notes.tex"
