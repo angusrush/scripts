@@ -1,1 +1,1 @@
-find ~/latex/ -type f -name "*.tex" | fzf | xargs -r nvim -c "cd %:p:h | next *.tex"
+find ~/latex/ -type f -name "*.tex" | fzf --layout=reverse --height 40% | xargs -r nvim -c "cd %:p:h | next *.tex"
