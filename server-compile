@@ -81,29 +81,39 @@ if forward_sync.returncode != 0:
     print("Forward rsync finished with nonzero exit code. Exiting.")
     sys.exit(1)
 
-ssh_command = "ssh "          \
-            + server          \
-            + " \""           \
-            + "cd /tmp/"      \
-            + top_folder      \
-            + " && "          \
-            + LATEXMK_COMMAND \
-            + " "             \
-            + filename        \
-            + "\""
+latexmk_command = LATEXMK_COMMAND \
+                + " "             \
+                + filename
+
+ssh_command     = "ssh "          \
+                + server          \
+                + " \""           \
+                + "cd /tmp/"      \
+                + top_folder      \
+                + " && "          \
+                + latexmk_command \
+                + "\""
 
 print("Success! Running command:")
-print("    " + ssh_command)
+print("    " + latexmk_command)
+print(" ")
+print("--------------------------------------")
 print("----- latexmk output begins here -----")
+print("--------------------------------------")
+print(" ")
 latexmk_run = sp.run(ssh_command, shell=True)
+print(" ")
+print("--------------------------------------")
 print("------ latexmk output ends here ------")
+print("--------------------------------------")
+print(" ")
 
 if latexmk_run.returncode != 0:
     print("Server-side latexmk run finished with nonzero exit code. \
             Not syncing back.")
     sys.exit(1)
 else:
-    print:("latexmk run successful! Syncing back...")
+    print("latexmk run successful! Syncing back...")
 
 rsync_back = sp.run("rsync -a -h --exclude=\"(.[!.]*|*.tex)\" --info=progress2 " \
         + server + ":/tmp/" + top_folder + "/ " + folder + "/", shell=True)
