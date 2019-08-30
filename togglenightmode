@@ -4,7 +4,9 @@ currentbrightness=$(cat /sys/class/backlight/intel_backlight/brightness)
 maxbrightness=$(cat /sys/class/backlight/intel_backlight/max_brightness)
 
 if [ $currentbrightness -eq "1" ]
-then xbright =400
-else xbright =1 
+then xbright =30 && pkill -SIGRTMIN+12 i3blocks
+elif [ $currentbrightness -eq "30" ]
+then xbright =10 && pkill -SIGRTMIN+12 i3blocks
+else xbright =1 && pkill -SIGRTMIN+12 i3blocks
 fi
 
