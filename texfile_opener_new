@@ -1,0 +1,3 @@
+texfile=$(find ~/latex/ -type f -name "*.tex" | sed -re "s/\/home\/angus\/latex\///g" | rofi -dmenu)
+
+nvim /home/angus/latex/$texfile
