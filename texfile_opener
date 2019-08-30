@@ -1,1 +1,1 @@
-find ~/latex/ -type f -name "*.tex" | fzf --layout=reverse --height 40% | xargs -r nvim -c "cd %:p:h | next *.tex"
+find ~/latex/ -type f -name "*.tex" | sed -re "s/\/home\/angus\/latex\///g" | fzf --layout=reverse --height 40% | xargs -I '{}' -r nvim -c "cd %:p:h" /home/angus/latex/{}
