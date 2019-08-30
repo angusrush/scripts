@@ -5,8 +5,10 @@ import sys
 
 SERVER = "angus@angus-server.duckdns.org"
 
+syncstring = "rsync -ah --info=progress2 /home/angus/Textbooks " + SERVER +":/home/angus"
+
 print("Syncing Textbooks collection to " + SERVER + "...")
-forward_sync = sp.run("rsync -ah --info=progress2 /home/angus/Textbooks angus-server.duckdns.org:/home/angus", shell=True)
+forward_sync = sp.run(syncstring, shell=True)
 
 if forward_sync.returncode != 0:
     print("Forward rsync finished with nonzero exit code. Exiting.")
