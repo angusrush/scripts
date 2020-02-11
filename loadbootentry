@@ -1,0 +1,1 @@
+sudo efibootmgr --disk /dev/sda --part 1 --create --label "Arch kernel" --loader /vmlinuz-linux --unicode 'root=UUID=d8bdd698-fd2c-40cd-91f6-370f5386d8aa rw quiet loglevel=3 i915.fastboot=1 initrd=\intel-ucode.img initrd=\initramfs-linux.img' --verbose
