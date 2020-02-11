@@ -5,7 +5,7 @@ import sys
 
 SERVER = "angus@angus-server.duckdns.org"
 
-syncstring = "rsync -ah --info=progress2 /home/angus/Textbooks " + SERVER +":/home/angus"
+syncstring = "rsync -ahv --info=progress2 /home/angus/Textbooks " + SERVER +":/home/angus"
 
 print("Syncing Textbooks collection to " + SERVER + "...")
 forward_sync = sp.run(syncstring, shell=True)
